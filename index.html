@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. Sınıf Alfabetik Sıralama Testi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0f4f8;
+            overflow: hidden; /* Sayfa kaydırmasını engelle */
+        }
+        .question-paper {
+             background-color: #ffffff;
+             background-image: linear-gradient(to bottom, transparent 98%, #dbeafe 98%);
+             background-size: 100% 3rem;
+             border-radius: 1rem;
+             padding: 2rem 2rem 2rem 3.5rem;
+             position: relative;
+             border: 1px solid #e2e8f0;
+             min-height: 150px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .question-paper::before {
+            content: '';
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            bottom: 1.5rem;
+            width: 2px;
+            background-color: #f87171;
+        }
+        .option-btn {
+            border-width: 2px;
+            border-radius: 1rem;
+            padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+        }
+         .option-btn:not(.selected):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .option-letter {
+            font-weight: 700;
+            margin-right: 1rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+        .option-btn:hover .option-letter {
+            transform: scale(1.1);
+        }
+        .feedback-popup {
+            animation: fadeInOut 1.5s ease-in-out forwards;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            20%, 80% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        .options-disabled {
+            pointer-events: none;
+        }
+        /* Geliştirilmiş Cevap Stilleri */
+        .option-btn.selected.correct {
+            border-color: #22c55e; /* green-500 */
+            background-color: #f0fdf4; /* green-50 */
+            animation: pulse-correct 0.6s ease-in-out;
+        }
+        .option-btn.selected.incorrect {
+            border-color: #ef4444; /* red-500 */
+            background-color: #fef2f2; /* red-50 */
+            animation: shake-incorrect 0.5s ease-in-out;
+        }
+         .option-btn.correct-answer {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+        }
+        @keyframes pulse-correct {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake-incorrect {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-3xl mx-auto">
+
+        <!-- Başlangıç Ekranı -->
+        <div id="start-screen" class="text-center p-8 bg-white rounded-2xl shadow-xl">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Alfabetik Sıralama Macerası</h1>
+            <p class="text-lg text-gray-600 mb-8">Harfleri ve kelimeleri ne kadar iyi sıraladığını göster. Maceraya hazır mısın?</p>
+            <button id="start-button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                Oyuna Başla!
+            </button>
+        </div>
+        
+        <!-- Oyun Ekranı -->
+        <div id="game-screen" class="hidden">
+            <header class="flex flex-col sm:flex-row justify-between items-center mb-6 p-4 bg-white rounded-2xl shadow-md gap-4">
+                 <div class="flex items-center space-x-4">
+                    <div id="lives" class="flex space-x-1 text-3xl"></div>
+                    <div id="score" class="text-xl font-bold bg-yellow-300 text-yellow-800 px-4 py-1 rounded-full">Puan: 0</div>
+                </div>
+                <div class="w-full sm:w-1/2">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium text-gray-700">İlerleme</span>
+                        <span id="progress-text" class="text-sm font-medium text-gray-700">Soru 1 / 15</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="question-paper mb-8">
+                <p id="question-text" class="text-2xl text-center font-semibold text-gray-800"></p>
+            </div>
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Seçenekler JS ile oluşturulacak -->
+            </div>
+        </div>
+        
+        <!-- Bitiş Ekranı -->
+        <div id="end-screen" class="hidden text-center p-8 bg-white rounded-2xl shadow-xl relative">
+             <canvas id="confetti-canvas"></canvas>
+             <h1 id="end-title" class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 z-20 relative">Test Bitti!</h1>
+             <p class="text-xl text-gray-600 mb-6 z-20 relative">Toplam Puanın: <span id="final-score" class="font-bold"></span></p>
+             <button id="restart-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform hover:scale-105 transition-transform duration-300 z-20 relative">
+                 Yeniden Oyna
+             </button>
+        </div>
+    </div>
+    
+    <!-- Geri bildirim pop-up'ı için konteyner -->
+    <div id="feedback-container" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50"></div>
+
+    <script>
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const livesEl = document.getElementById('lives');
+        const scoreEl = document.getElementById('score');
+        const finalScoreEl = document.getElementById('final-score');
+        const endTitleEl = document.getElementById('end-title');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const confettiCanvas = document.getElementById('confetti-canvas');
+
+        // --- YENİ: Ses Efektleri için AudioContext ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // --- YENİ: Soru Havuzu Genişletildi ---
+        const questions = [
+            { question: "Hangi ay adı sözlükte en <strong>başta</strong> yer alır?", options: ["Nisan", "Mayıs", "Haziran"], correctAnswer: "Haziran" },
+            { question: "Alfabemizin 15. harfi hangisidir?", options: ["L", "M", "N"], correctAnswer: "L" },
+            { question: "'Erik', 'İncir', 'Dut' meyveleri sözlükte nasıl sıralanır?", options: ["Dut-Erik-İncir", "İncir-Dut-Erik", "Erik-İncir-Dut"], correctAnswer: "Dut-Erik-İncir" },
+            { question: "Hangi taşıtın adı sözlükte diğerlerinden <strong>öncedir</strong>?", options: ["Gemi", "Tren", "Uçak"], correctAnswer: "Gemi" },
+            { question: "'Sekiz', 'Altı', 'Dokuz' sayılarından hangisinin okunuşu sözlükte <strong>önce</strong> gelir?", options: ["Sekiz", "Altı", "Dokuz"], correctAnswer: "Altı" },
+            { question: "'El', 'Kol', 'Baş' kelimelerinden hangisi sözlükte <strong>ortada</strong> yer alır?", options: ["El", "Kol", "Baş"], correctAnswer: "El" },
+            { question: "Alfabemizde 'H' ile 'J' harfleri arasında hangi harf bulunur?", options: ["I", "İ", "Ğ"], correctAnswer: "I" },
+            { question: "Hangi okul eşyası sözlükte en <strong>sondadır</strong>?", options: ["Sıra", "Tahta", "Tebeşir"], correctAnswer: "Tebeşir" },
+            { question: "'Mor', 'Turuncu', 'Pembe' renkleri sözlükte nasıl sıralanır?", options: ["Mor-Pembe-Turuncu", "Pembe-Mor-Turuncu", "Turuncu-Pembe-Mor"], correctAnswer: "Mor-Pembe-Turuncu" },
+            { question: "Alfabemizin 10. harfi hangisidir?", options: ["H", "G", "I"], correctAnswer: "H" },
+            { question: "Hangi sebze sözlükte diğerlerinden <strong>önce</strong> gelir?", options: ["Havuç", "Marul", "Soğan"], correctAnswer: "Havuç" },
+            { question: "Hangi akraba adı sözlükte en <strong>sonda</strong> yer alır?", options: ["Amca", "Dayı", "Hala"], correctAnswer: "Hala" },
+            { question: "'Kedi', 'Köpek', 'Kaplumbağa' hayvanlarından hangisi sözlükte <strong>ortadadır</strong>?", options: ["Kedi", "Köpek", "Kaplumbağa"], correctAnswer: "Kedi" },
+            { question: "Alfabemizin 25. harfi hangisidir?", options: ["T", "U", "V"], correctAnswer: "U" },
+            { question: "'Çilek', 'Armut', 'Muz' meyvelerinden hangisi sözlükte <strong>en başta</strong> yer alır?", options: ["Çilek", "Armut", "Muz"], correctAnswer: "Armut" }
+        ];
+
+        let score, lives, shuffledQuestions, currentQuestionIndex, gameActive;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // --- YENİ: Ses Efekti Fonksiyonları ---
+        function playSound(type) {
+            if (!audioCtx) return;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
+
+            if (type === 'correct') {
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+            } else if (type === 'incorrect') {
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            } else { // Start/Restart sound
+                 oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+            }
+
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        }
+
+        function startGame() {
+            playSound('start');
+            score = 0;
+            lives = 4;
+            currentQuestionIndex = 0;
+            gameActive = true;
+            shuffledQuestions = shuffleArray([...questions]);
+
+            updateScore();
+            updateLives();
+            showQuestion();
+
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= shuffledQuestions.length) {
+                endGame();
+                return;
+            }
+
+            const question = shuffledQuestions[currentQuestionIndex];
+            questionText.innerHTML = question.question;
+            optionsContainer.innerHTML = '';
+            optionsContainer.classList.remove('options-disabled');
+            updateProgress();
+
+            const optionColors = [
+                { border: 'border-yellow-500', mainText: 'text-yellow-800', circleBg: 'bg-yellow-500', circleText: 'text-white' },
+                { border: 'border-blue-500', mainText: 'text-blue-800', circleBg: 'bg-blue-500', circleText: 'text-white' },
+                { border: 'border-green-500', mainText: 'text-green-800', circleBg: 'bg-green-500', circleText: 'text-white' }
+            ];
+            
+            const shuffledOptions = shuffleArray([...question.options]);
+
+            shuffledOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.dataset.option = option;
+                const letter = String.fromCharCode(65 + index);
+                const color = optionColors[index % 3];
+                
+                button.innerHTML = `
+                    <span class="option-letter ${color.circleBg} ${color.circleText}">${letter}</span>
+                    <span class="text-xl font-semibold">${option}</span>`;
+                
+                button.className = `option-btn ${color.border} ${color.mainText}`;
+                button.addEventListener('click', (e) => selectAnswer(button, question.correctAnswer));
+                optionsContainer.appendChild(button);
+            });
+        }
+        
+        function selectAnswer(selectedButton, correctAnswer) {
+            if (!gameActive) return;
+            optionsContainer.classList.add('options-disabled');
+            
+            const selectedOption = selectedButton.dataset.option;
+            const isCorrect = selectedOption === correctAnswer;
+
+            selectedButton.classList.add('selected');
+
+            if (isCorrect) {
+                score += 10;
+                playSound('correct');
+                selectedButton.classList.add('correct');
+                showFeedback('Doğru! 🎉', 'bg-green-500');
+            } else {
+                lives--;
+                playSound('incorrect');
+                selectedButton.classList.add('incorrect');
+                showFeedback('Yanlış! 😟', 'bg-red-500');
+
+                // --- YENİ: Doğru cevabı göster ---
+                const correctButton = optionsContainer.querySelector(`[data-option="${correctAnswer}"]`);
+                if (correctButton) {
+                    correctButton.classList.add('correct-answer');
+                }
+            }
+            
+            updateScore();
+            updateLives();
+            
+            setTimeout(() => {
+                 if (lives <= 0) {
+                    endGame();
+                } else {
+                    currentQuestionIndex++;
+                    showQuestion();
+                }
+            }, 1800); // Geri bildirimi görmek için süreyi biraz uzattım
+        }
+        
+        function showFeedback(message, bgColor) {
+            const feedbackEl = document.createElement('div');
+            feedbackEl.textContent = message;
+            feedbackEl.className = `feedback-popup text-white font-bold text-2xl py-3 px-6 rounded-full shadow-xl ${bgColor}`;
+            feedbackContainer.innerHTML = '';
+            feedbackContainer.appendChild(feedbackEl);
+        }
+
+        function updateProgress() {
+            const progressPercentage = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            progressText.textContent = `Soru ${currentQuestionIndex + 1} / ${questions.length}`;
+        }
+
+        function updateScore() {
+            scoreEl.textContent = `Puan: ${score}`;
+        }
+
+        function updateLives() {
+            livesEl.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const heart = document.createElement('span');
+                heart.textContent = i < lives ? '❤️' : '🤍';
+                if (i >= lives) heart.classList.add('opacity-40');
+                livesEl.appendChild(heart);
+            }
+        }
+        
+        function endGame() {
+            gameActive = false;
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreEl.textContent = score;
+            
+            if (lives <= 0) {
+                 endTitleEl.textContent = "Tekrar Dene! 👍";
+            } else if (score >= 120) { // Yüksek puan eşiği güncellendi
+                endTitleEl.textContent = "Harikasın! 🏆";
+                launchConfetti(); // --- YENİ: Konfeti efekti ---
+            } else {
+                 endTitleEl.textContent = "Çok İyi! 😊";
+            }
+            updateProgress(); // Son soruyu da ilerleme çubuğuna yansıt
+            progressBar.style.width = '100%';
+        }
+        
+        // --- YENİ: Konfeti Efekti Fonksiyonu ---
+        function launchConfetti() {
+            const ctx = confettiCanvas.getContext('2d');
+            const W = confettiCanvas.width = endScreen.offsetWidth;
+            const H = confettiCanvas.height = endScreen.offsetHeight;
+            let particles = [];
+            const particleCount = 100;
+            const colors = ["#f87171", "#3b82f6", "#facc15", "#4ade80", "#a78bfa"];
+
+            function Particle() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H - H;
+                this.r = Math.random() * 6 + 1;
+                this.d = Math.random() * particleCount;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.tilt = Math.floor(Math.random() * 10) - 10;
+                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
+                this.tiltAngle = 0;
+            }
+
+            Particle.prototype.draw = function() {
+                ctx.beginPath();
+                ctx.lineWidth = this.r;
+                ctx.strokeStyle = this.color;
+                ctx.moveTo(this.x + this.tilt + (this.r / 2), this.y);
+                ctx.lineTo(this.x + this.tilt, this.y + this.tilt + (this.r / 2));
+                ctx.stroke();
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                for (let i = 0; i < particleCount; i++) {
+                    particles[i].draw();
+                }
+                update();
+            }
+
+            function update() {
+                let remaining = 0;
+                for (let i = 0; i < particleCount; i++) {
+                    const p = particles[i];
+                    p.tiltAngle += p.tiltAngleIncremental;
+                    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                    p.x += Math.sin(p.d);
+                    p.tilt = Math.sin(p.tiltAngle - (i / 3)) * 15;
+
+                    if (p.y < H) remaining++;
+                }
+                if (remaining > 0) {
+                    requestAnimationFrame(draw);
+                } else {
+                     ctx.clearRect(0, 0, W, H);
+                }
+            }
+            
+             requestAnimationFrame(draw);
+        }
+
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+
+    </script>
+</body>
+</html>
