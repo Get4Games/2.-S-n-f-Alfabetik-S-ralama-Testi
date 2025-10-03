@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. Sınıf Alfabetik Sıralama Etkinliği</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF ve Canvas Kütüphaneleri -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0f2fe; /* light-blue-100 */
+        }
+
+        .font-kalam {
+            font-family: 'Kalam', cursive;
+        }
+
+        /* Defter Kağıdı Stili */
+        .notebook-paper {
+            background-color: #fffefc;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            position: relative;
+            /* Yatay mavi çizgileri oluşturur */
+            background-image: repeating-linear-gradient(
+                #fffefc 0,
+                #fffefc 2.9rem,
+                #dbeafe 3rem, /* blue-200 */
+                #fffefc 3rem
+            );
+            background-size: 100% 3rem;
+            line-height: 3rem;
+        }
+
+        /* Dikey kırmızı kenar çizgisini oluşturur */
+        .notebook-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 40px; /* Sol kenar boşluğu */
+            bottom: 0;
+            width: 2px;
+            background-color: #fca5a5; /* red-300 */
+        }
+        
+        .selection-box-check {
+            color: #dc2626; /* red-600 */
+            font-weight: 700;
+            font-size: 1.5rem;
+            line-height: 1; /* Check işareti için satır yüksekliğini sıfırla */
+        }
+
+        .word-pair {
+             height: 3rem; /* Satır yüksekliği ile aynı */
+             padding-bottom: 0;
+             margin-bottom: 0;
+             border-bottom: none; /* Alt çizgiyi kaldır, defter çizgisi var */
+        }
+
+        /* Başlık ve açıklamanın satır yüksekliğini normale döndür */
+        .header-content {
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-3xl notebook-paper rounded-lg p-6 md:p-8 pl-14 md:pl-16">
+        <header class="text-center mb-6 header-content">
+            <h1 class="font-kalam text-4xl md:text-5xl font-bold text-gray-700">Alfabetik Sıralama Etkinliği</h1>
+            <p class="text-gray-500 mt-3 text-lg">Sözlükte önce gelen kelimeyi işaretle!</p>
+        </header>
+
+        <!-- Soruların oluşturulacağı alan -->
+        <main id="worksheet-area" class="space-y-0 mb-6">
+            <!-- Kelime çiftleri JavaScript ile buraya eklenecek -->
+        </main>
+
+        <!-- Harekete Geçirici Mesaj (CTA) -->
+        <div class="bg-amber-50 border border-amber-200 rounded-lg mt-8 p-5 text-center header-content">
+            <h3 class="font-bold text-amber-800 text-xl">📄 Çalışma Kağıdını İndir</h3>
+            <p class="text-amber-700 mt-2">
+                Etkinliği tamamladıktan sonra, cevaplarınla birlikte PDF olarak bilgisayarına indirebilirsin.
+            </p>
+            <button id="downloadPdfBtn" onclick="downloadPDF()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-md disabled:bg-slate-400 disabled:scale-100">
+                PDF Olarak İndir
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const wordPairs = [
+            ['kitap', 'kalem'], ['defter', 'dondurma'], ['portakal', 'pırasa'], ['çanta', 'çorap'],
+            ['masa', 'mandalina'], ['silgi', 'simit'], ['bardak', 'tabak'], ['güneş', 'ay'],
+            ['anne', 'baba'], ['okul', 'sınıf'], ['yaz', 'kış'], ['ağaç', 'çiçek'],
+            ['balık', 'kuş'], ['elma', 'erik'], ['kedi', 'köpek'], ['araba', 'uçak'],
+            ['telefon', 'televizyon'], ['göz', 'kulak'], ['ev', 'bahçe'], ['yıldız', 'bulut']
+        ];
+
+        function toggleCheck(element) {
+            const boxWrapper = element.parentElement;
+            const boxes = Array.from(boxWrapper.children);
+
+            if (element.innerHTML.includes('✓')) {
+                element.innerHTML = '';
+                return;
+            }
+
+            boxes.forEach(box => {
+                box.innerHTML = '';
+            });
+
+            element.innerHTML = '<span class="selection-box-check">✓</span>';
+        }
+
+        function downloadPDF() {
+            const downloadButton = document.getElementById('downloadPdfBtn');
+            if (downloadButton.disabled) return;
+            
+            const originalButtonText = downloadButton.innerHTML;
+            downloadButton.disabled = true;
+            downloadButton.innerHTML = 'İndiriliyor...';
+
+            const worksheetContainer = document.querySelector('.notebook-paper');
+            const ctaBox = worksheetContainer.querySelector('.bg-amber-50');
+            
+            // PDF'te görünmemesi için indirme butonunu gizle
+            ctaBox.style.display = 'none';
+
+            html2canvas(worksheetContainer, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#fffefc'
+            }).then(canvas => {
+                // Butonu tekrar görünür yap
+                ctaBox.style.display = 'block';
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const canvasAspectRatio = canvas.width / canvas.height;
+                
+                const margin = 10;
+                let imgWidth = pdfWidth - (margin * 2);
+                let imgHeight = imgWidth / canvasAspectRatio;
+
+                if (imgHeight > pdfHeight - (margin * 2)) {
+                    imgHeight = pdfHeight - (margin * 2);
+                    imgWidth = imgHeight * canvasAspectRatio;
+                }
+
+                const x = (pdfWidth - imgWidth) / 2;
+                const y = margin;
+
+                pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+                pdf.save('alfabetik-siralama-etkinligi.pdf');
+
+                downloadButton.disabled = false;
+                downloadButton.innerHTML = originalButtonText;
+
+            }).catch(err => {
+                console.error("PDF oluşturulurken bir hata oluştu: ", err);
+                ctaBox.style.display = 'block';
+                downloadButton.disabled = false;
+                downloadButton.innerHTML = originalButtonText;
+                // alert() yerine console.log kullanılıyor
+                console.log("PDF oluşturulamadı. Lütfen konsolu kontrol edin.");
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const worksheetArea = document.getElementById('worksheet-area');
+            worksheetArea.innerHTML = ''; // Önceki içeriği temizle
+
+            wordPairs.forEach(pair => {
+                const pairContainer = document.createElement('div');
+                pairContainer.className = 'word-pair flex items-center justify-between';
+
+                const wordWrapper = document.createElement('div');
+                wordWrapper.className = 'word-wrapper flex items-center gap-3 text-xl font-medium text-gray-800';
+                wordWrapper.innerHTML = `
+                    <span class="flex-1 min-w-[100px]">${pair[0]}</span>
+                    <span class="text-slate-400">-</span>
+                    <span class="flex-1 min-w-[100px]">${pair[1]}</span>`;
+
+                const boxWrapper = document.createElement('div');
+                boxWrapper.className = 'box-wrapper flex items-center gap-3';
+                
+                pair.forEach(() => {
+                    const box = document.createElement('div');
+                    box.className = 'selection-box flex items-center justify-center w-10 h-10 bg-white rounded-md border-2 border-slate-400 cursor-pointer transition-colors hover:border-blue-400';
+                    box.setAttribute('onclick', 'toggleCheck(this)');
+                    boxWrapper.appendChild(box);
+                });
+
+                pairContainer.appendChild(wordWrapper);
+                pairContainer.appendChild(boxWrapper);
+                worksheetArea.appendChild(pairContainer);
+            });
+        });
+    </script>
+</body>
+</html>
