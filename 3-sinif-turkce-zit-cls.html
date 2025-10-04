@@ -9,329 +9,169 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
     # CSS Kodu
 <style>
-    :root {
-        --page-bg: #fdfdf6;
-        --text-color: #333;
-        --line-color: #cce0ff;
-        --margin-line-color: rgba(255, 150, 150, 0.6);
-        --accent-color: #007bff;
-        --example-color: #e91e63;
-        --ink-color: #0d47a1;
-    }
-
-    body {
-        font-family: 'Quicksand', sans-serif;
-        background-color: #e8e8e3;
-        margin: 0;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: var(--text-color);
-    }
-
-    .worksheet-container {
-        background-color: var(--page-bg);
-        width: 100%;
-        max-width: 800px; /* Masaüstü için sınırlı genişlik */
-        padding: 20px 20px 20px 40px;
-        box-sizing: border-box;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 30px;
-    }
-
-    .worksheet-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 40px;
-        width: 2px;
-        height: 100%;
-        background-color: var(--margin-line-color);
-    }
-
-    .hole-punches {
-        position: absolute;
-        left: 10px;
-        top: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        padding: 20px 0;
-        box-sizing: border-box;
-    }
-
-    .hole {
-        width: 8mm;
-        height: 8mm;
-        background-color: #e8e8e3;
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-    }
-
-    header h1 {
-        font-size: 1.3em;
-        font-weight: 600;
-        margin-bottom: 20px;
-        text-align: left;
-    }
-
-    main {
-        flex-grow: 1;
-        background-image: repeating-linear-gradient(to bottom, transparent, transparent 49px, var(--line-color) 49px, var(--line-color) 50px);
-        background-position-y: 15px;
-    }
-
-    .columns {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px 40px;
-    }
-
-    .word-item {
-        display: flex;
-        align-items: center;
-        font-size: 1.1em;
-        min-height: 45px;
-    }
-
-    .word {
-        font-weight: 500;
-        width: 90px;
-        flex-shrink: 0;
-    }
-
-    .arrow {
-        margin: 0 10px;
-        color: var(--accent-color);
-    }
-
-    .answer-space {
-        font-family: 'Caveat', cursive;
-        font-size: 1.4em;
-        font-weight: 500;
-        color: var(--ink-color);
-        flex-grow: 1;
-        padding-left: 5px;
-        cursor: text;
-    }
-
-    .answer-space:focus {
-        outline: none;
-        background-color: rgba(0, 123, 255, 0.05);
-        border-radius: 3px;
-    }
-
-    .example-answer {
-         font-family: 'Caveat', cursive;
-         font-size: 1.4em;
-         font-weight: 500;
-         flex-grow: 1;
-         padding-left: 5px;
-         color: var(--example-color);
-    }
-
-    footer {
-        width: calc(100% - 60px);
-        position: relative;
-        margin-top: 20px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.9em;
-        font-weight: 500;
-        color: #888;
-    }
-
-    .print-button-container {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .print-button {
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-family: 'Quicksand', sans-serif;
-        font-size: 1em;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .print-button:hover {
-        background-color: #0056b3;
-        transform: translateY(-2px);
-    }
-
-    @media (max-width: 768px) {
-        .worksheet-container {
-            padding: 15px 15px 15px 20px;
+        /* CSS Değişkenleri (Kullanıcının tercihleri entegre edildi) */
+        :root {
+            --page-bg: #fdfdf6; /* Defter kâğıdı rengi */
+            --text-color: #333;
+            --line-color: #cce0ff; /* Açık mavi çizgi rengi */
+            --margin-line-color: rgba(255, 150, 150, 0.6); /* Kırmızı kenar çizgisi */
+            --accent-color: #007bff;
+            --example-color: #e91e63;
+            --ink-color: #0d47a1; /* Koyu mavi mürekkep rengi */
+            
+            /* Fluid birimler (Mobile uyumlu) */
+            --line-height: 3rem; /* Satır yüksekliği: 48px */
+            --margin-width: 4rem; /* Kenar boşluğu genişliği: 64px */
         }
 
-        .worksheet-container::before {
-            left: 20px;
-        }
-
-        .columns {
-            grid-template-columns: 1fr; /* Mobilde tek sütun */
-            gap: 15px 0;
-        }
-
-        .word {
-            width: 80px;
-        }
-
-        .answer-space, .example-answer {
-            font-size: 1.3em;
-        }
-    }
-
-    @media print {
+        /* Temel Fontlar ve Arka Plan */
         body {
-            background-color: #fff;
-            padding: 0;
+            font-family: 'Quicksand', sans-serif;
+            background-color: #e8e8e3;
+            color: var(--text-color);
         }
-        .worksheet-container {
-            box-shadow: none;
-            margin: 0;
-            width: 100%;
-            padding: 15mm 15mm 15mm 35mm;
+        .font-caveat {
+            font-family: 'Caveat', cursive;
         }
-        .worksheet-container::before {
-            left: 30mm;
+        
+        /* Defter çizgisi arka planı - Sadece yazı alanına uygulanır */
+        .notebook-lines {
+            background-color: var(--page-bg);
+            /* Çizgi tekrarını ve rengini ayarla */
+            background-image: repeating-linear-gradient(to bottom, 
+                transparent, 
+                transparent calc(var(--line-height) - 1px), 
+                var(--line-color) calc(var(--line-height) - 1px), 
+                var(--line-color) var(--line-height)
+            );
+            background-position-y: 1.5rem; /* Başlık altından hizala */
+            background-size: 100% var(--line-height);
         }
-        .print-button-container, .hole-punches {
-            display: none;
-        }
-        footer {
-            width: calc(100% - 50mm);
-            left: 35mm;
-            bottom: 10mm;
-        }
-    }
-</style>
 
+        /* Cevap alanı alt çizgi efekti (Kullanıcı girdisini vurgulamak için) */
+        .answer-space:not(.example-answer) {
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.2); 
+            transition: border-color 0.2s;
+            cursor: text;
+        }
+        .answer-space:focus {
+            outline: none;
+            border-bottom-color: var(--ink-color);
+            background-color: rgba(0, 123, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        /* Word Item yüksekliğini satır yüksekliğine sabitle */
+        .word-item {
+            height: var(--line-height);
+            line-height: var(--line-height);
+        }
+
+        /* Baskı (Print) Ayarları - A4 Kağıt Düzeni */
+        @media print {
+            body {
+                background-color: #fff !important;
+                padding: 0 !important;
+            }
+            .worksheet-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 210mm; /* A4 genişliği */
+                min-height: 297mm; /* A4 yüksekliği */
+                /* Sol kenar boşluğu (margin-width) + içerik sağ/üst/alt boşluğu */
+                padding: 15mm 15mm 15mm 0 !important;
+            }
+            /* Grid ile ayırdığımız alanı mm cinsinden sabitle */
+            .worksheet-content {
+                 grid-template-columns: 35mm 1fr !important; /* 35mm marj alanı + içerik */
+            }
+            .red-line {
+                 background-color: var(--margin-line-color) !important;
+            }
+            .print-button-container, .hole {
+                display: none !important; /* Buton ve delikleri gizle */
+            }
+            .answer-space {
+                 border-bottom: none !important; /* Baskıda alt çizgiyi kaldır */
+            }
+            .notebook-lines {
+                /* Baskıda arka plan çizgilerini hafiflet */
+                background-color: #fff;
+                background-image: repeating-linear-gradient(to bottom, 
+                    transparent, 
+                    transparent calc(var(--line-height) - 1px), 
+                    rgba(204, 224, 255, 0.6) calc(var(--line-height) - 1px), 
+                    rgba(204, 224, 255, 0.6) var(--line-height)
+                );
+            }
+            footer {
+                left: 35mm !important;
+                width: calc(100% - 50mm) !important;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8">
 
-<div class="print-button-container" id="printButtonContainer">
-    <button class="print-button" onclick="window.print()">🖨️ Yazdır / PDF Olarak Kaydet</button>
-</div>
-
-<div class="worksheet-container">
-    <div class="hole-punches">
-        <div class="hole"></div>
-        <div class="hole"></div>
-        <div class="hole"></div>
-        <div class="hole"></div>
+    <!-- Yazdırma Butonu -->
+    <div class="print-button-container w-full max-w-4xl text-center mb-6" id="printButtonContainer">
+        <button onclick="window.print()"
+            class="print-button bg-[var(--accent-color)] hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+            <span class="mr-2">🖨️</span> Yazdır / PDF Olarak Kaydet
+        </button>
     </div>
 
-    <header>
-        <h1>1. Aşağıda verilen kelimelerin zıt anlamlarını örnekteki gibi yazalım.</h1>
-    </header>
+    <!-- Çalışma Sayfası Konteyneri (Mobil/Fluid + Baskı için A4) -->
+    <div class="worksheet-container bg-[var(--page-bg)] max-w-4xl w-full min-h-[85vh] shadow-xl rounded-lg overflow-hidden relative flex flex-col">
+        
+        <!-- İçerik Alanı: Kenar Boşluğu + Yazı Alanı (Grid ile ayrıldı) -->
+        <div class="worksheet-content flex-grow grid grid-cols-[var(--margin-width)_1fr] relative p-4 sm:p-8 md:p-12 pb-20">
 
-    <main>
-        <div class="columns">
-            <div class="column">
-                <div class="word-item">
-                    <span class="word">uzak</span>
-                    <span class="arrow">→</span>
-                    <span class="example-answer">yakın</span>
+            <!-- SOL MARJ ALANI (Delikler ve Kırmızı Çizgi) -->
+            <div class="paper-margin relative h-full flex-shrink-0">
+                
+                <!-- Kırmızı Çizgi -->
+                <div class="red-line absolute top-0 right-0 w-[2px] h-full bg-[var(--margin-line-color)] z-10"></div>
+                
+                <!-- Defter Delikleri (Merkeze hizalandı) -->
+                <div class="hole-punches absolute inset-y-0 left-1/2 -translate-x-1/2 flex flex-col justify-evenly py-8">
+                    <!-- Delik sayısını artırarak A4 formatına yaklaştırdık -->
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
+                    <div class="hole w-3 h-3 bg-stone-200 border border-gray-300 rounded-full shadow-inner"></div>
                 </div>
-                <div class="word-item">
-                    <span class="word">taze</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">eski</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">ince</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">dar</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">büyük</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">erken</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">yüksek</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
+
             </div>
-            <div class="column">
-                <div class="word-item">
-                    <span class="word">aydınlık</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">gece</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">yumuşak</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">şişman</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">genç</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">kirli</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">az</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
-                <div class="word-item">
-                    <span class="word">siyah</span>
-                    <span class="arrow">→</span>
-                    <span class="answer-space" contenteditable="true"></span>
-                </div>
+
+            <!-- SAĞ YAZI ALANI (Başlık ve Çizgili İçerik) -->
+            <div class="paper-writing notebook-lines h-full pt-4 md:pt-2">
+                <header class="mb-6 px-1">
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-gray-200 pb-2">
+                        1. Aşağıda verilen kelimelerin zıt anlamlarını örnekteki gibi yazalım.
+                    </h1>
+                </header>
+
+                <main class="h-full">
+                    <div class="columns grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4 px-1">
+                        <!-- Bu div'ler script tarafından doldurulacak -->
+                        <div class="column col-span-1"></div>
+                        <div class="column col-span-1"></div>
+                    </div>
+                </main>
             </div>
         </div>
-    </main>
 
-    <footer>
-        <div class="footer-left">ilkokulakademi.com</div>
-        <div class="footer-right">3. Sınıf Türkçe</div>
-    </footer>
-</div>
+        <!-- Alt Bilgi -->
+        <footer class="w-full absolute bottom-4 left-0 right-0 flex justify-between text-sm md:text-base font-medium text-gray-500 px-12 md:px-16">
+            <div class="footer-left">ilkokulakademi.com</div>
+            <div class="footer-right">3. Sınıf Türkçe | Sayfa 1</div>
+        </footer>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
