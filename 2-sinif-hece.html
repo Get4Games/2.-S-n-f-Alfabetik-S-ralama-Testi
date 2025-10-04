@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. Sınıf Hece Bilgisi Testi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0f4f8; /* Açık gri-mavi arka plan */
+        }
+        .quiz-wrapper {
+            max-width: 800px;
+            margin: auto;
+            padding: 1rem;
+        }
+        .main-container {
+            background-color: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+        }
+        .question-box {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            padding-left: 4rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: relative;
+            border: 1px solid #e5e7eb;
+            min-height: 150px;
+        }
+        .question-box::before {
+            content: '';
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            bottom: 1.5rem;
+            width: 4px;
+            background-color: #f87171;
+            border-radius: 2px;
+        }
+        .option-button {
+            border: 2px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s ease-in-out;
+            color: #374151;
+        }
+        .option-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-color: #6366f1;
+        }
+        .option-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            color: white;
+            margin-right: 12px;
+        }
+        .correct-answer {
+            background-color: #22c55e !important;
+            border-color: #166534 !important;
+            color: white !important;
+        }
+        .correct-answer .option-letter {
+             background-color: white !important;
+             color: #166534 !important;
+        }
+        .wrong-answer {
+            background-color: #ef4444 !important;
+            border-color: #991b1b !important;
+            color: white !important;
+        }
+        .wrong-answer .option-letter {
+             background-color: white !important;
+             color: #991b1b !important;
+        }
+        .heart-icon { font-size: 1.75rem; color: #ef4444; }
+        .star-icon { font-size: 3rem; color: #facc15; }
+        .star-empty { color: #e5e7eb; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div id="quiz-container" class="quiz-wrapper w-full">
+
+        <!-- Başlangıç Ekranı -->
+        <div id="start-screen" class="text-center p-8 bg-white rounded-2xl shadow-lg">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">2. Sınıf Hece Bilgisi Testi</h1>
+            <p class="text-gray-600 text-lg mb-8">Testte 12 yepyeni soru var. Her doğru cevap 10 puan. 4 can hakkın bulunuyor. Başarılar!</p>
+            <button id="start-button" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-indigo-700 transition-all transform hover:scale-105">
+                Teste Başla
+            </button>
+        </div>
+
+        <!-- Sınav Ekranı (Başlangıçta gizli) -->
+        <div id="quiz-screen" class="hidden main-container">
+            <div class="mb-6 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-1" id="lives-container"></div>
+                <div class="bg-yellow-300 text-yellow-800 font-bold px-4 py-1 rounded-full text-lg">Puan: <span id="score-display">0</span></div>
+                <div class="text-gray-500 font-semibold">Soru <span id="question-current">1</span> / 12</div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full" style="width: 8%"></div>
+            </div>
+            <div class="question-box mb-6 flex items-center justify-center">
+                <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-center text-gray-800"></h2>
+            </div>
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- Sonuç Ekranı (Başlangıçta gizli) -->
+        <div id="result-screen" class="hidden text-center p-8 bg-white rounded-2xl shadow-lg">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-2">Tebrikler!</h1>
+            <p class="text-gray-600 text-lg mb-6">Testi tamamladın. İşte sonuçların:</p>
+            <div class="flex justify-center mb-6" id="star-container"></div>
+            <div class="text-2xl font-semibold text-gray-700 mb-8">
+                <p>Toplam Puanın: <span id="final-score" class="text-indigo-600 font-bold"></span></p>
+                <p>Doğru Sayısı: <span id="correct-answers" class="text-green-500 font-bold"></span></p>
+            </div>
+            <button id="restart-button" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-indigo-700 transition-all transform hover:scale-105">
+                Yeniden Başla
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elementleri
+            const startScreen = document.getElementById('start-screen');
+            const quizScreen = document.getElementById('quiz-screen');
+            const resultScreen = document.getElementById('result-screen');
+            const startButton = document.getElementById('start-button');
+            const restartButton = document.getElementById('restart-button');
+            const livesContainer = document.getElementById('lives-container');
+            const scoreDisplay = document.getElementById('score-display');
+            const questionCurrent = document.getElementById('question-current');
+            const progressBar = document.getElementById('progress-bar');
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const correctAnswersDisplay = document.getElementById('correct-answers');
+            const starContainer = document.getElementById('star-container');
+
+            // Tamamen YENİLENMİŞ Soru Listesi
+            const questions = [
+                { question: '"Makarna" kelimesi kaç heceden oluşur?', options: ['2', '3', '4'], answer: '3' },
+                { question: 'Aşağıdaki kelimelerden hangisi tek hecelidir?', options: ['Dert', 'Mavi', 'Sarı'], answer: 'Dert' },
+                { question: '"Gazete" kelimesinin doğru hecelenişi hangisidir?', options: ['Ga-ze-te', 'Gaz-e-te', 'Ga-zet-e'], answer: 'Ga-ze-te' },
+                { question: 'Hangisi "tiyatro" kelimesiyle aynı hece sayısına sahiptir?', options: ['Sinema', 'Film', 'Sahne'], answer: 'Sinema' },
+                { question: '"İtfaiye" kelimesi hecelerine nasıl ayrılır?', options: ['İt-fai-ye', 'İt-fa-i-ye', 'İ-tfa-i-ye'], answer: 'İt-fa-i-ye' },
+                { question: 'Cümledeki renkli kelime kaç hecedir: "Gökyüzü <span class="text-blue-500 font-bold">bugün</span> çok güzel."', options: ['1', '2', '3'], answer: '2' },
+                { question: 'Aşağıdaki kelimelerden hangisi üç hecelidir?', options: ['Kral', 'Kraliçe', 'Saray'], answer: 'Kraliçe' },
+                { question: '"Mendil" kelimesi kaç heceden oluşur?', options: ['1', '2', '3'], answer: '2' },
+                { question: 'Aşağıdaki kelimelerden hangisinin hece sayısı en azdır?', options: ['Kamyon', 'Gök', 'Bisiklet'], answer: 'Gök' },
+                { question: '"Portakal" kelimesinin doğru hecelenişi hangisidir?', options: ['Por-ta-kal', 'Po-rta-kal', 'Port-a-kal'], answer: 'Por-ta-kal' },
+                { question: 'Hangi kelime hecelerine yanlış ayrılmıştır?', options: ['A-i-le', 'Ö-ğren-ci', 'Ö-ğret-men'], answer: 'A-i-le' },
+                { question: '"Salatalık" kelimesi kaç hecelidir?', options: ['2', '3', '4'], answer: '4' }
+            ];
+            
+            let currentQuestionIndex = 0;
+            let lives = 4;
+            let score = 0;
+            let questionsShuffled = [];
+
+            function shuffleArray(array) {
+                return array.sort(() => Math.random() - 0.5);
+            }
+
+            function startGame() {
+                lives = 4;
+                score = 0;
+                currentQuestionIndex = 0;
+                questionsShuffled = shuffleArray([...questions]);
+                
+                startScreen.classList.add('hidden');
+                resultScreen.classList.add('hidden');
+                quizScreen.classList.remove('hidden');
+
+                updateLivesUI();
+                updateScoreUI();
+                displayQuestion();
+            }
+
+            function displayQuestion() {
+                if (currentQuestionIndex >= questionsShuffled.length || lives <= 0) {
+                    showResults();
+                    return;
+                }
+                
+                const progressPercentage = ((currentQuestionIndex + 1) / questionsShuffled.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+                questionCurrent.textContent = currentQuestionIndex + 1;
+
+                const questionData = questionsShuffled[currentQuestionIndex];
+                questionText.innerHTML = questionData.question;
+                optionsContainer.innerHTML = '';
+                
+                const optionLetters = ['A', 'B', 'C'];
+                const letterColors = ['bg-orange-400', 'bg-blue-400', 'bg-green-400'];
+                
+                shuffleArray(questionData.options).forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'option-button w-full p-3 rounded-xl text-lg font-semibold flex items-center';
+                    
+                    const letterCircle = document.createElement('span');
+                    letterCircle.className = `option-letter ${letterColors[index % letterColors.length]}`;
+                    letterCircle.textContent = optionLetters[index];
+
+                    const optionText = document.createElement('span');
+                    optionText.textContent = option;
+                    
+                    button.appendChild(letterCircle);
+                    button.appendChild(optionText);
+
+                    button.addEventListener('click', () => selectAnswer(button, option, questionData.answer));
+                    optionsContainer.appendChild(button);
+                });
+            }
+
+            function selectAnswer(button, selectedOption, correctAnswer) {
+                Array.from(optionsContainer.children).forEach(btn => {
+                    btn.disabled = true;
+                    if (btn.textContent.includes(correctAnswer)) {
+                        btn.classList.add('correct-answer');
+                    }
+                });
+
+                if (selectedOption === correctAnswer) {
+                    score += 10;
+                    updateScoreUI();
+                } else {
+                    lives--;
+                    button.classList.add('wrong-answer');
+                    updateLivesUI();
+                }
+
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                }, 1500);
+            }
+
+            function updateLivesUI() {
+                livesContainer.innerHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const heart = document.createElement('span');
+                    heart.className = 'heart-icon';
+                    heart.textContent = i < lives ? '❤️' : '🤍';
+                    livesContainer.appendChild(heart);
+                }
+            }
+
+            function updateScoreUI() {
+                scoreDisplay.textContent = score;
+            }
+
+            function showResults() {
+                quizScreen.classList.add('hidden');
+                resultScreen.classList.remove('hidden');
+                
+                const correctCount = score / 10;
+                finalScoreDisplay.textContent = score;
+                correctAnswersDisplay.textContent = `${correctCount} / ${questionsShuffled.length}`;
+
+                starContainer.innerHTML = '';
+                let starCount = 0;
+                if (correctCount >= 10) starCount = 3;
+                else if (correctCount >= 7) starCount = 2;
+                else if (correctCount >= 4) starCount = 1;
+
+                for (let i = 0; i < 3; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'star-icon';
+                    star.textContent = i < starCount ? '★' : '☆';
+                    if(i >= starCount) star.classList.add('star-empty');
+                    starContainer.appendChild(star);
+                }
+            }
+            
+            startButton.addEventListener('click', startGame);
+            restartButton.addEventListener('click', startGame);
+        });
+    </script>
+</body>
+</html>
