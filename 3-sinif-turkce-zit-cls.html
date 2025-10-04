@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zıt Anlamlı Kelimeler Çalışma Kağıdı</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #ffffff;
+            --text-color: #333;
+            --line-color: #e0e0e0;
+            --accent-color: #007bff;
+            --example-color: #e91e63;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+        }
+
+        .worksheet-container {
+            background-color: var(--page-bg);
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25mm;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header h1 {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: left;
+            border-bottom: 2px solid var(--line-color);
+            padding-bottom: 10px;
+        }
+
+        main {
+            flex-grow: 1;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px; /* row-gap column-gap */
+        }
+
+        .word-item {
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            line-height: 2.5; /* Defter satır aralığı */
+            background-image: linear-gradient(transparent 95%, var(--line-color) 95%);
+            background-size: 100% 100%;
+        }
+
+        .word {
+            font-weight: 500;
+            width: 90px;
+        }
+
+        .arrow {
+            margin: 0 10px;
+            color: var(--accent-color);
+        }
+
+        .answer-space {
+            font-weight: 600;
+            flex-grow: 1;
+            padding-left: 5px;
+            border-bottom: 2px dotted #999;
+            min-width: 80px; /* Boşken tıklanabilir olması için */
+            display: inline-block; /* min-width özelliğinin çalışması için */
+            cursor: text;
+        }
+        
+        .answer-space:focus {
+            outline: 1px solid var(--accent-color);
+            background-color: rgba(0, 123, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .example-answer {
+             font-weight: 600;
+             flex-grow: 1;
+             padding-left: 5px;
+             color: var(--example-color);
+             border-bottom: 2px dotted #999;
+        }
+
+        footer {
+            width: calc(100% - 50mm); /* Adjust for container padding */
+            position: absolute;
+            bottom: 15mm;
+            left: 25mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #888;
+        }
+
+        .print-button-container {
+            width: 210mm;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none; /* Başlangıçta gizli */
+        }
+
+        .print-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .print-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+            .worksheet-container {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                padding: 15mm;
+            }
+            .print-button-container {
+                display: none;
+            }
+            footer {
+                 width: calc(100% - 30mm);
+                 left: 15mm;
+                 bottom: 10mm;
+            }
+            .answer-space:focus {
+                outline: none;
+                background-color: transparent;
+            }
+            .answer-space {
+                border-bottom: 2px dotted #999 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-button-container" id="printButtonContainer">
+        <button class="print-button" onclick="window.print()">🖨️ Yazdır / PDF Olarak Kaydet</button>
+    </div>
+
+    <div class="worksheet-container">
+        <header>
+            <h1>1. Aşağıda verilen kelimelerin zıt anlamlarını örnekteki gibi yazalım.</h1>
+        </header>
+
+        <main>
+            <div class="columns">
+                <!-- Sol Sütun -->
+                <div class="column">
+                    <div class="word-item">
+                        <span class="word">uzak</span>
+                        <span class="arrow">→</span>
+                        <span class="example-answer">yakın</span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">taze</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">eski</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">ince</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">dar</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">büyük</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">erken</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">yüksek</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                </div>
+
+                <!-- Sağ Sütun -->
+                <div class="column">
+                     <div class="word-item">
+                        <span class="word">aydınlık</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">gece</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">yumuşak</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">şişman</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">genç</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">kirli</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">az</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                    <div class="word-item">
+                        <span class="word">siyah</span>
+                        <span class="arrow">→</span>
+                        <span class="answer-space" contenteditable="true"></span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-left">ilkokulakademi.com</div>
+            <div class="footer-right">3. Sınıf Türkçe</div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const answerSpaces = document.querySelectorAll('.answer-space');
+            const printButtonContainer = document.getElementById('printButtonContainer');
+
+            const checkCompletion = () => {
+                // Her bir boşluğun dolu olup olmadığını kontrol et
+                const allFilled = [...answerSpaces].every(space => space.textContent.trim() !== '');
+
+                // Eğer hepsi doluysa butonu göster, değilse gizle
+                if (allFilled) {
+                    printButtonContainer.style.display = 'block';
+                } else {
+                    printButtonContainer.style.display = 'none';
+                }
+            };
+
+            // Her bir cevap alanına yazıldığında kontrol fonksiyonunu çağır
+            answerSpaces.forEach(space => {
+                space.addEventListener('input', checkCompletion);
+            });
+        });
+    </script>
+
+</body>
+</html>
+
