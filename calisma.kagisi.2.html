@@ -28,15 +28,14 @@
         /* A4 Page Container */
         #a4-page {
             background-color: white;
-            width: 210mm; /* Standard A4 width for desktop */
-            height: 297mm; /* Standard A4 height */
+            width: 210mm;
+            min-height: 297mm;
             padding: 20mm;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             box-sizing: border-box;
             position: relative;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevent overflow on desktop */
         }
 
         /* Header */
@@ -52,9 +51,8 @@
         .content {
             flex-grow: 1;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 25px 40px; /* Dikey ve yatay boşluk */
-            overflow-y: auto; /* Allow scrolling if content overflows on desktop */
         }
 
         /* Individual Word Item */
@@ -62,13 +60,11 @@
             display: flex;
             align-items: center;
             font-size: 1.2em;
-            gap: 10px; /* Better spacing between elements */
         }
 
         .word-item .word {
             font-weight: 500;
-            min-width: 120px; /* Min width for alignment, but flexible */
-            flex-shrink: 0;
+            width: 120px; /* Kelimelerin hizalı durması için sabit genişlik */
         }
         
         /* Example Styling */
@@ -79,7 +75,7 @@
         
         .word-item.example .syllable {
             margin-left: 10px;
-            min-width: 150px;
+            width: 150px;
         }
         
         .word-item.example .count {
@@ -105,7 +101,6 @@
             padding: 5px;
             background-color: transparent;
             text-align: center;
-            transition: border-bottom 0.3s ease;
         }
         
         .input-syllable:focus,
@@ -115,8 +110,7 @@
         }
 
         .input-syllable {
-            flex-grow: 1;
-            min-width: 150px;
+            width: 150px;
         }
 
         .input-count {
@@ -157,35 +151,11 @@
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-            min-width: 150px; /* Better touch target */
         }
         
-        #download-btn:hover,
-        #download-btn:focus {
+        #download-btn:hover {
             background-color: #1976D2;
             transform: translateY(-2px);
-        }
-
-        /* Print Styles for PDF Optimization */
-        @media print {
-            body {
-                background-color: white;
-                padding: 0;
-            }
-            #a4-page {
-                width: 210mm;
-                height: 297mm;
-                padding: 0;
-                margin: 0;
-                box-shadow: none;
-                overflow: visible;
-            }
-            #download-btn {
-                display: none; /* Hide button in print */
-            }
-            .content {
-                overflow: visible;
-            }
         }
 
         /* Responsive Design for Mobile Devices */
@@ -197,11 +167,10 @@
 
             #a4-page {
                 width: 100%;
-                height: auto; /* Flexible height for mobile */
-                min-height: auto;
-                padding: 15px; /* Reduced padding for smaller screens */
+                height: auto;
+                min-height: 0;
+                padding: 20px 15px; /* Better padding */
                 box-shadow: none;
-                overflow: visible; /* Allow natural flow */
             }
 
             .header h1 {
@@ -211,55 +180,36 @@
 
             .content {
                 grid-template-columns: 1fr; /* Single column */
-                gap: 20px; /* Slightly reduced gap for mobile */
+                gap: 25px;
             }
 
             .word-item {
                 font-size: 1.1em;
-                flex-direction: row; /* Keep row but allow wrap */
-                flex-wrap: wrap;
-                gap: 10px;
+                flex-wrap: wrap; /* Allow wrapping */
+                gap: 5px 10px; /* Add gap between items */
                 align-items: center;
             }
             
             .word-item .word {
-                min-width: 100px; /* Slightly smaller for mobile */
+                width: 120px; /* Consistent width for alignment */
+                flex-shrink: 0;
             }
             
             .input-syllable {
-                flex-grow: 1;
-                min-width: 120px;
-                font-size: 1.1em; /* Larger for touch */
+                flex-grow: 1; /* Flexible width */
+                min-width: 120px; /* Minimum width */
             }
 
             .input-count {
-                width: 50px;
-                font-size: 1.1em; /* Larger for touch */
+                width: 45px; /* Small fixed width */
+                flex-shrink: 0;
             }
 
             .footer {
                 flex-direction: column; /* Stack footer items */
                 align-items: center;
-                gap: 10px;
-                margin-top: 30px;
-            }
-
-            #download-btn {
-                padding: 15px 30px; /* Larger padding for touch */
-                font-size: 1.1em;
-            }
-        }
-
-        /* Extra Small Devices (e.g., phones under 480px) */
-        @media (max-width: 480px) {
-            .word-item {
-                font-size: 1em; /* Slightly smaller text if needed */
                 gap: 8px;
-            }
-
-            .input-syllable,
-            .input-count {
-                font-size: 1em;
+                margin-top: 30px;
             }
         }
     </style>
