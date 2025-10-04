@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4. Sınıf Alfabetik Sıralama Testi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            touch-action: manipulation; /* Mobil cihazlarda çift dokunma zoom'unu engeller */
+        }
+        .heart {
+            color: red;
+            font-size: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .star {
+            color: #FFD700;
+            font-size: 3rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .correct {
+            animation: flash-green 0.8s;
+            background-color: #10B981 !important;
+            color: white !important;
+            border-color: #059669 !important;
+        }
+        .incorrect {
+            animation: flash-red 0.8s;
+            background-color: #EF4444 !important;
+            color: white !important;
+            border-color: #DC2626 !important;
+        }
+
+        @keyframes flash-green {
+            0%, 100% { background-color: #10B981; border-color: #059669; }
+            50% { background-color: white; border-color: #10B981; }
+        }
+        @keyframes flash-red {
+            0%, 100% { background-color: #EF4444; border-color: #DC2626; }
+            50% { background-color: white; border-color: #EF4444; }
+        }
+        
+        .feedback-alert {
+            animation: fadeInOut 1s forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        .notebook-paper {
+            background-color: #fefefe;
+            background-image:
+                repeating-linear-gradient(to bottom, transparent 0, transparent 2.4rem, #dbe4f0 2.4rem, #dbe4f0 2.5rem),
+                linear-gradient(to right, transparent 3.5rem, #f9cccc 3.5rem, #f9cccc 3.7rem, transparent 3.7rem);
+            background-size: 100% 2.5rem, 100% 100%;
+            line-height: 2.5rem;
+            padding: 1rem 1.5rem 1rem 4.5rem; /* top right bottom left */
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen flex items-center justify-center p-4">
+
+    <div id="quiz-container" class="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+        <!-- Üst Bilgi: Canlar ve Soru Sayacı -->
+        <div class="flex justify-between items-center border-b pb-4 mb-6">
+            <div id="lives" class="flex space-x-1">
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+            </div>
+            <div id="question-counter" class="text-indigo-600 font-bold text-lg bg-indigo-100 rounded-full px-4 py-1">
+                Soru 1 / 12
+            </div>
+        </div>
+
+        <!-- Soru Alanı -->
+        <div id="question-box" class="notebook-paper min-h-[120px] flex items-center mb-8 rounded-lg">
+            <p id="question-text" class="text-xl md:text-2xl text-gray-800 font-semibold"></p>
+        </div>
+
+        <!-- Seçenekler -->
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Seçenekler JavaScript ile buraya eklenecek -->
+        </div>
+    </div>
+
+    <!-- Sonuç Ekranı (Modal) -->
+    <div id="result-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 text-center w-full max-w-md transform transition-all scale-95 opacity-0">
+            <h2 id="result-title" class="text-3xl font-bold text-indigo-700 mb-4">Harika İş!</h2>
+            <p id="result-message" class="text-gray-600 mb-6">Testi başarıyla tamamladın.</p>
+            <div id="star-rating" class="flex justify-center space-x-2 mb-6">
+                <!-- Yıldızlar buraya gelecek -->
+            </div>
+            <p id="score-text" class="text-2xl font-bold text-gray-800 mb-8">12 sorudan 10 tanesini doğru bildin!</p>
+            <button id="restart-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors text-lg shadow-lg">
+                Yeniden Başla
+            </button>
+        </div>
+    </div>
+    
+    <!-- Doğru/Yanlış Bildirimi -->
+    <div id="feedback-alert" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full text-white font-bold text-xl shadow-2xl">
+    </div>
+
+
+    <script>
+        // DOM Elementleri
+        const quizContainer = document.getElementById('quiz-container');
+        const livesContainer = document.getElementById('lives');
+        const questionCounter = document.getElementById('question-counter');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const resultModal = document.getElementById('result-modal');
+        const resultTitle = document.getElementById('result-title');
+        const resultMessage = document.getElementById('result-message');
+        const starRating = document.getElementById('star-rating');
+        const scoreText = document.getElementById('score-text');
+        const restartBtn = document.getElementById('restart-btn');
+        const feedbackAlert = document.getElementById('feedback-alert');
+
+        // Test Soruları
+        const questions = [
+            {
+                question: "'Elma', 'Armut', 'Kiraz', 'Çilek' kelimelerinden hangisi sözlükte en başta yer alır?",
+                options: ["Elma", "Armut", "Kiraz", "Çilek"],
+                answer: "Armut"
+            },
+            {
+                question: "Aşağıdaki kelimeler alfabetik olarak sıralandığında hangisi üçüncü sırada olur?",
+                options: ["Masa", "Sandalye", "Dolap", "Yatak"],
+                answer: "Sandalye"
+            },
+            {
+                question: "'Kitap' kelimesinin harfleri alfabetik sıraya konulduğunda doğru sıralama hangisidir?",
+                options: ["a, i, k, p, t", "a, k, i, p, t", "a, i, p, t, k", "a, p, t, i, k"],
+                answer: "a, i, k, p, t"
+            },
+            {
+                question: "'Okul' kelimesinden sözlükte hemen sonra hangi kelime gelebilir?",
+                options: ["Ocak", "Oda", "Olta", "Oyun"],
+                answer: "Olta"
+            },
+            {
+                question: "'Tren, Uçak, Gemi, Araba' kelimelerinin doğru alfabetik sıralaması hangisidir?",
+                options: ["Araba, Gemi, Tren, Uçak", "Gemi, Araba, Uçak, Tren", "Araba, Tren, Uçak, Gemi", "Uçak, Tren, Gemi, Araba"],
+                answer: "Araba, Gemi, Tren, Uçak"
+            },
+            {
+                question: "Aşağıdaki kelimelerden hangisi sözlükte diğerlerinden sonra gelir?",
+                options: ["Zeytin", "Peynir", "Ekmek", "Reçel"],
+                answer: "Zeytin"
+            },
+            {
+                question: "'Bugün hava çok güzel.' cümlesindeki kelimelerden hangisi sözlükte en önce gelir?",
+                options: ["Bugün", "Hava", "Çok", "Güzel"],
+                answer: "Bugün"
+            },
+            {
+                question: "'Kalem, Silgi, Defter, Çanta' kelimeleri sıralandığında en sonda hangisi yer alır?",
+                options: ["Kalem", "Silgi", "Defter", "Çanta"],
+                answer: "Silgi"
+            },
+            {
+                question: "'Kamyon, Kedi, Köpek, Kuş' kelimeleri sözlük sırasına göre sıralandığında ikinci kelime hangisi olur?",
+                options: ["Kamyon", "Kedi", "Köpek", "Kuş"],
+                answer: "Kedi"
+            },
+            {
+                question: "'Türkiye' kelimesinin harfleri alfabetik sıraya konulursa son harf hangisi olur?",
+                options: ["T", "Ü", "R", "Y"],
+                answer: "Y"
+            },
+            {
+                question: "Aşağıdaki hayvanlardan hangisinin adı sözlükte en sonda yer alır?",
+                options: ["Aslan", "Kaplan", "Fil", "Zürafa"],
+                answer: "Zürafa"
+            },
+            {
+                question: "'Pencere, Perde, Park, Pilot' kelimelerinden hangisi sözlükte en başta yer alır?",
+                options: ["Pencere", "Perde", "Park", "Pilot"],
+                answer: "Park"
+            }
+        ];
+
+        // Oyun Değişkenleri
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let lives = 4;
+        let questionsShuffled = [];
+
+        // Başlangıç Fonksiyonu
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            lives = 4;
+            questionsShuffled = [...questions].sort(() => Math.random() - 0.5); // Soruları karıştır
+            updateLivesDisplay();
+            displayQuestion();
+            resultModal.classList.add('hidden');
+            resultModal.querySelector('div').classList.add('scale-95', 'opacity-0');
+            quizContainer.classList.remove('hidden');
+        }
+
+        // Soru Görüntüleme
+        function displayQuestion() {
+            if (currentQuestionIndex >= questionsShuffled.length || lives <= 0) {
+                showResults();
+                return;
+            }
+
+            const currentQuestion = questionsShuffled[currentQuestionIndex];
+            questionText.textContent = currentQuestion.question;
+            questionCounter.textContent = `Soru ${currentQuestionIndex + 1} / ${questionsShuffled.length}`;
+            optionsContainer.innerHTML = '';
+
+            const optionColors = [
+                'border-red-400 text-red-600 hover:bg-red-50',
+                'border-blue-400 text-blue-600 hover:bg-blue-50',
+                'border-green-400 text-green-600 hover:bg-green-50',
+                'border-yellow-400 text-yellow-600 hover:bg-yellow-50'
+            ];
+            
+            // Seçenekleri karıştırarak her defasında farklı sırada gelmesini sağla
+            const shuffledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = `option-btn w-full text-left p-4 rounded-lg border-2 font-semibold text-lg ${optionColors[index % 4]}`;
+                button.onclick = () => selectAnswer(option, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Cevap Seçme
+        function selectAnswer(selectedOption, button) {
+            // Butonlara tekrar tıklamayı engelle
+            const buttons = optionsContainer.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            const correct_answer = questionsShuffled[currentQuestionIndex].answer;
+            
+            if (selectedOption === correct_answer) {
+                score++;
+                button.classList.add('correct');
+                showFeedback(true);
+            } else {
+                lives--;
+                button.classList.add('incorrect');
+                showFeedback(false);
+                updateLivesDisplay();
+                // Doğru cevabı da göster
+                buttons.forEach(btn => {
+                    if (btn.textContent === correct_answer) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                displayQuestion();
+            }, 1200); // Otomatik geçiş için bekleme süresi
+        }
+        
+        // Doğru/Yanlış Bildirimi
+        function showFeedback(isCorrect) {
+            if(isCorrect) {
+                feedbackAlert.textContent = 'Doğru! 🎉';
+                feedbackAlert.className = 'feedback-alert fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full text-white font-bold text-xl shadow-2xl bg-green-500';
+            } else {
+                feedbackAlert.textContent = 'Yanlış! 😥';
+                feedbackAlert.className = 'feedback-alert fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full text-white font-bold text-xl shadow-2xl bg-red-500';
+            }
+            feedbackAlert.classList.remove('hidden');
+            setTimeout(() => feedbackAlert.classList.add('hidden'), 1000);
+        }
+
+        // Canları Güncelleme
+        function updateLivesDisplay() {
+            livesContainer.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const heartSpan = document.createElement('span');
+                heartSpan.className = 'heart transition-opacity duration-300';
+                heartSpan.textContent = '❤️';
+                if (i >= lives) {
+                    heartSpan.classList.add('opacity-20');
+                }
+                livesContainer.appendChild(heartSpan);
+            }
+        }
+        
+        // Sonuçları Gösterme
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultModal.classList.remove('hidden');
+            setTimeout(() => {
+                 resultModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+            }, 10);
+           
+            scoreText.textContent = `${questionsShuffled.length} sorudan ${score} tanesini doğru bildin!`;
+
+            const percentage = (score / questionsShuffled.length) * 100;
+            let stars = 0;
+            if (lives === 0) {
+                 resultTitle.textContent = "Tekrar Dene!";
+                 resultMessage.textContent = "Canların bitti ama pes etmek yok!";
+                 stars = 0;
+            } else if (percentage === 100) {
+                resultTitle.textContent = "Mükemmel! 🏆";
+                resultMessage.textContent = "Tüm soruları doğru cevapladın, harikasın!";
+                stars = 3;
+            } else if (percentage >= 70) {
+                resultTitle.textContent = "Çok İyi! ✨";
+                resultMessage.textContent = "Neredeyse tamamdı, harika bir iş çıkardın!";
+                stars = 2;
+            } else {
+                resultTitle.textContent = "İyi Gidiyorsun! 👍";
+                resultMessage.textContent = "Biraz daha gayretle daha iyisini yapabilirsin!";
+                stars = 1;
+            }
+
+            starRating.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const starSpan = document.createElement('span');
+                starSpan.className = 'star';
+                starSpan.textContent = '⭐';
+                if (i >= stars) {
+                    starSpan.classList.add('opacity-30');
+                }
+                starRating.appendChild(starSpan);
+            }
+        }
+
+        // Yeniden Başlatma Butonu
+        restartBtn.addEventListener('click', startQuiz);
+
+        // Testi Başlat
+        startQuiz();
+    </script>
+
+</body>
+</html>
+
+
+
