@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zıt Anlamlı Kelimeler Çalışma Kağıdı</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
-    # CSS Kodu
-<style>
+    <title>Zıt Anlamlı Kelimeler Çalışma Sayfası</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Quicksand (Genel) ve Caveat (El Yazısı) -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    
+    <style>
         /* CSS Değişkenleri (Kullanıcının tercihleri entegre edildi) */
         :root {
             --page-bg: #fdfdf6; /* Defter kâğıdı rengi */
@@ -66,6 +67,15 @@
             height: var(--line-height);
             line-height: var(--line-height);
         }
+        
+        /* Loading animasyonu için CSS */
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
 
         /* Baskı (Print) Ayarları - A4 Kağıt Düzeni */
         @media print {
@@ -88,8 +98,8 @@
             .red-line {
                  background-color: var(--margin-line-color) !important;
             }
-            .print-button-container, .hole {
-                display: none !important; /* Buton ve delikleri gizle */
+            .print-button-container, .hole, .feedback-icon {
+                display: none !important; /* Buton, delikler ve ikonları gizle */
             }
             .answer-space {
                  border-bottom: none !important; /* Baskıda alt çizgiyi kaldır */
@@ -113,11 +123,16 @@
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 md:p-8">
 
-    <!-- Yazdırma Butonu -->
-    <div class="print-button-container w-full max-w-4xl text-center mb-6" id="printButtonContainer">
+    <!-- Yazdırma Butonu ve Kontrol Butonu -->
+    <div class="print-button-container w-full max-w-4xl text-center mb-6 flex justify-center space-x-4" id="printButtonContainer">
         <button onclick="window.print()"
             class="print-button bg-[var(--accent-color)] hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
             <span class="mr-2">🖨️</span> Yazdır / PDF Olarak Kaydet
+        </button>
+        <!-- Gemini API Entegrasyonu: Cevap Kontrolü -->
+        <button onclick="checkAnswers()"
+            class="llm-button bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-8 rounded-xl transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+            <span class="mr-2">✨</span> Cevapları Kontrol Et
         </button>
     </div>
 
@@ -173,30 +188,202 @@
         </footer>
     </div>
 
+    <!-- JavaScript ile Kelimeleri Dinamik Olarak Oluşturma ve Gemini Kontrolü -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const answerSpaces = document.querySelectorAll('.answer-space');
-            const printButtonContainer = document.getElementById('printButtonContainer');
+        // Sayfayı dolduracak kelimeler listesi
+        const words = [
+            { word: "uzak", answer: "yakın", isExample: true },
+            { word: "taze", answer: "bayat" },
+            { word: "eski", answer: "yeni" },
+            { word: "ince", answer: "kalın" },
+            { word: "dar", answer: "geniş" },
+            { word: "büyük", answer: "küçük" },
+            { word: "erken", answer: "geç" },
+            { word: "yüksek", answer: "alçak" },
+            { word: "aydınlık", answer: "karanlık" },
+            { word: "gece", answer: "gündüz" },
+            { word: "yumuşak", answer: "sert" },
+            { word: "şişman", answer: "zayıf" },
+            { word: "genç", answer: "yaşlı" },
+            { word: "kirli", answer: "temiz" },
+            { word: "az", answer: "çok" },
+            { word: "siyah", answer: "beyaz" },
+        ];
 
-            const checkCompletion = () => {
-                // Her bir boşluğun dolu olup olmadığını kontrol et
-                const allFilled = [...answerSpaces].every(space => space.textContent.trim() !== '');
+        const columns = document.querySelectorAll('div.columns > .column');
 
-                // Eğer hepsi doluysa butonu göster, değilse gizle
-                if (allFilled) {
-                    printButtonContainer.style.display = 'block';
-                } else {
-                    printButtonContainer.style.display = 'none';
+        // Kelimeleri sütunlara dağıtma
+        words.forEach((item, index) => {
+            const columnIndex = index % 2; // Basitçe iki sütuna dağıt
+            const column = columns[columnIndex];
+            
+            const answerClass = item.isExample ? 'example-answer' : 'answer-space';
+            const contentEditable = item.isExample ? '' : 'contenteditable="true"';
+            
+            // Eğer örnekse cevabı göster (pembe), değilse boş bırak (mavi/koyu)
+            const answerContent = item.isExample ? item.answer : ''; 
+
+            const html = `
+                <div class="word-item flex items-center text-lg md:text-xl relative">
+                    <span class="word font-medium w-16 text-gray-700">${item.word}</span>
+                    <span class="arrow text-[var(--accent-color)] mx-2">→</span>
+                    <span class="${answerClass} ${item.isExample ? 'text-[var(--example-color)]' : 'text-[var(--ink-color)]'} font-caveat text-3xl flex-grow px-1" 
+                          ${contentEditable}>${answerContent}</span>
+                </div>
+            `;
+            column.insertAdjacentHTML('beforeend', html);
+        });
+
+        // =========================================================================
+        // GEMINI API ENTEGRASYONU: CEVAP KONTROLÜ
+        // =========================================================================
+
+        /**
+         * LLM API çağrısını üstel geri çekilme (exponential backoff) ile dener.
+         */
+        async function retryFetch(url, payload, maxRetries = 5) {
+            let delay = 1000;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        return await response.json();
+                    } else if (response.status === 429 && i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        throw new Error(`API çağrısı başarısız oldu: ${response.status}`);
+                    }
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                        console.error("Son API çağrısı denemesi başarısız oldu:", error);
+                        throw error;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+            throw new Error("Çoklu denemeden sonra API çağrısı başarısız oldu.");
+        }
+
+        /**
+         * Öğrencinin cevaplarını toplar ve Gemini API'yi kullanarak doğruluğunu kontrol eder.
+         */
+        async function checkAnswers() {
+            const checkButton = document.querySelector('.llm-button');
+            const originalWords = document.querySelectorAll('.word');
+            const answerSpaces = document.querySelectorAll('.answer-space[contenteditable="true"]');
+            
+            // Önceki geri bildirim simgelerini temizle
+            document.querySelectorAll('.feedback-icon').forEach(icon => icon.remove());
+            
+            // Kullanıcı verilerini topla
+            const userAnswers = [];
+            let promptText = "Aşağıdaki kelime çiftlerinin zıt anlamlı olup olmadığını kontrol et. Cevap boş bırakılmışsa veya geçersizse 'is_correct: false' olarak işaretle. Cevabın doğruluğuna bakarken Türkçe'deki en yaygın ve kabul görmüş zıt anlamlı kelimeyi kullan. Çiftler:\n";
+
+            answerSpaces.forEach((space, index) => {
+                // index + 1 çünkü ilk eleman örnek (uzak → yakın)
+                const wordElement = originalWords[index + 1]; 
+                const word = wordElement.textContent.trim();
+                const userAnswer = space.textContent.trim().toLowerCase();
+
+                userAnswers.push({ word, userAnswer, element: space });
+                promptText += `\nKelime: "${word}", Öğrenci Cevabı: "${userAnswer}"`;
+            });
+
+            if (userAnswers.length === 0 || !userAnswers.some(a => a.userAnswer !== '')) {
+                alert("Lütfen kontrol için en az bir kelimenin zıt anlamını yazın.");
+                return;
+            }
+
+            // Yükleme durumunu ayarla
+            checkButton.disabled = true;
+            checkButton.innerHTML = '<span class="mr-2 animate-spin">⏳</span> Kontrol Ediliyor...';
+
+            const apiKey = ""; // Canvas ortamı tarafından sağlanır
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const systemPrompt = "Sen, Türkçe dilbilgisi ve kelime bilgisi konusunda uzman, ilkokul seviyesine uygun geri bildirimler veren bir öğretmensin. Görevin, öğrencilerin zıt anlamlı kelimeler alıştırmasındaki cevaplarını kontrol etmektir. Yanıtını daima verilen JSON şemasına uygun olarak, sadece JSON olarak döndürmelisin. Geri bildirim (feedback_tr) kısa, teşvik edici ve doğru kelimeyi belirten nitelikte olmalıdır.";
+
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "word": { "type": "STRING" },
+                                "user_answer": { "type": "STRING" },
+                                "is_correct": { "type": "BOOLEAN" },
+                                "correct_answer": { "type": "STRING" },
+                                "feedback_tr": { "type": "STRING" }
+                            },
+                            "propertyOrdering": ["word", "user_answer", "is_correct", "correct_answer", "feedback_tr"]
+                        }
+                    }
                 }
             };
+            
+            try {
+                const result = await retryFetch(apiUrl, payload);
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            // Her bir cevap alanına yazıldığında kontrol fonksiyonunu çağır
-            answerSpaces.forEach(space => {
-                space.addEventListener('input', checkCompletion);
-            });
-        });
+                if (!jsonText) {
+                    throw new Error("API'den geçerli JSON yanıtı alınamadı.");
+                }
+
+                const feedbackArray = JSON.parse(jsonText);
+
+                // Geri bildirimi işle ve göster
+                let correctCount = 0;
+                const totalCount = feedbackArray.length;
+
+                userAnswers.forEach((item) => {
+                    const feedback = feedbackArray.find(f => f.word === item.word);
+                    const parent = item.element.closest('.word-item');
+
+                    if (feedback) {
+                        const icon = document.createElement('span');
+                        // absolute -right-12: word-item'a göre sağa 3rem (48px) dışarıya konumlandırır.
+                        icon.classList.add('feedback-icon', 'ml-2', 'text-2xl', 'absolute', '-right-12', 'top-1/2', '-translate-y-1/2', 'cursor-pointer');
+                        
+                        if (feedback.is_correct) {
+                            icon.textContent = '✅';
+                            correctCount++;
+                            parent.classList.add('transition', 'bg-green-50/50', 'rounded');
+                            setTimeout(() => parent.classList.remove('bg-green-50/50'), 2000);
+                        } else {
+                            icon.textContent = '❌';
+                            parent.classList.add('transition', 'bg-red-50/50', 'rounded');
+                            setTimeout(() => parent.classList.remove('bg-red-50/50'), 2000);
+                        }
+
+                        // Detaylı geri bildirim için title/tooltip ekle
+                        icon.setAttribute('title', feedback.feedback_tr);
+                        parent.appendChild(icon);
+                    }
+                });
+
+                // Tamamlanma mesajını göster
+                alert(`Kontrol tamamlandı! ${totalCount} sorudan ${correctCount} tanesi doğru. Yanlış cevaplar (❌) için simgenin üzerine gelerek geri bildirimi okuyabilirsiniz.`);
+
+            } catch (error) {
+                console.error("Cevapları kontrol ederken bir hata oluştu:", error);
+                alert("Cevapları kontrol etme sırasında bir hata oluştu. Konsolu kontrol edin.");
+            } finally {
+                // Yükleme durumunu sıfırla
+                checkButton.disabled = false;
+                checkButton.innerHTML = '<span class="mr-2">✨</span> Cevapları Kontrol Et';
+            }
+        }
     </script>
-
 </body>
 </html>
-
