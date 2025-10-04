@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hece Ayırma Etkinliği</title>
+    <!-- Google Fonts: Quicksand -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- jsPDF and html2canvas Libraries for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0f8ff; /* Açık Mavi Tonu */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* A4 Page Container */
+        #a4-page {
+            background-color: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header h1 {
+            font-size: 1.5em;
+            text-align: center;
+            color: #005a9c;
+            margin-bottom: 40px;
+            font-weight: 700;
+        }
+
+        /* Words Grid */
+        .content {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px 40px; /* Dikey ve yatay boşluk */
+        }
+
+        /* Individual Word Item */
+        .word-item {
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+        }
+
+        .word-item .word {
+            font-weight: 500;
+            width: 120px; /* Kelimelerin hizalı durması için sabit genişlik */
+        }
+        
+        /* Example Styling */
+        .word-item.example .syllable, .word-item.example .count {
+            color: #e53935; /* Kırmızı renk */
+            font-weight: bold;
+        }
+        
+        .word-item.example .syllable {
+            margin-left: 10px;
+            width: 150px;
+        }
+        
+        .word-item.example .count {
+            margin-left: 10px;
+            width: 50px;
+            height: 40px;
+            border: 2px solid #42a5f5;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            color: #1e88e5;
+        }
+
+        /* Input Fields for Syllables and Count */
+        .input-syllable,
+        .input-count {
+            border: none;
+            border-bottom: 2px dotted #a0a0a0;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1em;
+            margin-left: 10px;
+            padding: 5px;
+            background-color: transparent;
+            text-align: center;
+        }
+        
+        .input-syllable:focus,
+        .input-count:focus {
+            outline: none;
+            border-bottom: 2px dotted #005a9c;
+        }
+
+        .input-syllable {
+            width: 150px;
+        }
+
+        .input-count {
+            width: 50px;
+        }
+        
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding-top: 20px;
+            margin-top: auto;
+            font-size: 0.9em;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .footer .left {
+            text-align: left;
+        }
+        
+        .footer .right {
+            text-align: right;
+        }
+        
+        /* PDF Download Button */
+        #download-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1em;
+            font-weight: 700;
+            color: white;
+            background-color: #2196F3; /* Canlı Mavi */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        
+        #download-btn:hover {
+            background-color: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design for Mobile Devices */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                -webkit-text-size-adjust: 100%; /* iOS font scaling fix */
+            }
+
+            #a4-page {
+                width: 100%;
+                height: auto;
+                min-height: 0;
+                padding: 20px 15px; /* Better padding */
+                box-shadow: none;
+            }
+
+            .header h1 {
+                font-size: 1.3em;
+                line-height: 1.4;
+            }
+
+            .content {
+                grid-template-columns: 1fr; /* Single column */
+                gap: 25px;
+            }
+
+            .word-item {
+                font-size: 1.1em;
+                flex-wrap: wrap; /* Allow wrapping */
+                gap: 5px 10px; /* Add gap between items */
+                align-items: center;
+            }
+            
+            .word-item .word {
+                width: 120px; /* Consistent width for alignment */
+                flex-shrink: 0;
+            }
+            
+            .input-syllable {
+                flex-grow: 1; /* Flexible width */
+                min-width: 120px; /* Minimum width */
+            }
+
+            .input-count {
+                width: 45px; /* Small fixed width */
+                flex-shrink: 0;
+            }
+
+            .footer {
+                flex-direction: column; /* Stack footer items */
+                align-items: center;
+                gap: 8px;
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- A4 Page Content -->
+    <div id="a4-page">
+        <header class="header">
+            <h1>Aşağıdaki kelimeleri hecelerine ayırıp kelimelerin kaç heceden oluştuğunu örnekteki gibi yazalım.</h1>
+        </header>
+
+        <main class="content" id="word-list">
+            <!-- Word items will be injected here by JavaScript -->
+        </main>
+
+        <footer class="footer">
+            <div class="left">ilkokulakademi.com</div>
+            <div class="right">2. Sınıf Türkçe</div>
+        </footer>
+    </div>
+
+    <!-- Download Button -->
+    <button id="download-btn">PDF Olarak İndir</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const words = [
+                { word: 'bayrak', syllable: 'bay-rak', count: 2, isExample: true },
+                { word: 'ceviz' }, { word: 'kumanda' },
+                { word: 'kurt' }, { word: 'tornavida' },
+                { word: 'tablo' }, { word: 'eczane' },
+                { word: 'arkadaş' }, { word: 'veteriner' },
+                { word: 'televizyon' }, { word: 'hoşgörü' },
+                { word: 'kahve' }, { word: 'matematik' },
+                { word: 'öğrenci' }, { word: 'ayakkabı' },
+                { word: 'silgi' }, { word: 'erik' },
+                { word: 'yeşillik' }
+            ];
+
+            const wordListContainer = document.getElementById('word-list');
+
+            // Populate the word list
+            words.forEach(item => {
+                const wordItem = document.createElement('div');
+                wordItem.classList.add('word-item');
+
+                if (item.isExample) {
+                    wordItem.classList.add('example');
+                    wordItem.innerHTML = `
+                        <div class="word">${item.word}</div>
+                        <div class="syllable">${item.syllable}</div>
+                        <div class="count">${item.count}</div>
+                    `;
+                } else {
+                    wordItem.innerHTML = `
+                        <div class="word">${item.word}</div>
+                        <input type="text" class="input-syllable" placeholder="...........">
+                        <input type="text" class="input-count" placeholder="...">
+                    `;
+                }
+                wordListContainer.appendChild(wordItem);
+            });
+
+            // PDF Download functionality
+            const downloadButton = document.getElementById('download-btn');
+            const pageToPrint = document.getElementById('a4-page');
+
+            downloadButton.addEventListener('click', () => {
+                // Temporarily disable placeholders for a cleaner PDF
+                const inputs = pageToPrint.querySelectorAll('input');
+                const originalPlaceholders = [];
+                inputs.forEach(input => {
+                    originalPlaceholders.push(input.placeholder);
+                    input.placeholder = '';
+                });
+
+                html2canvas(pageToPrint, {
+                    scale: 2, // Higher scale for better quality
+                    useCORS: true
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    
+                    // A4 dimensions in mm: 210 x 297
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    
+                    // Calculate aspect ratio
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    const canvasRatio = canvasHeight / canvasWidth;
+                    
+                    let finalWidth = pdfWidth;
+                    let finalHeight = pdfWidth * canvasRatio;
+
+                    // If height exceeds page, scale down
+                    if (finalHeight > pdfHeight) {
+                        finalHeight = pdfHeight;
+                        finalWidth = pdfHeight / canvasRatio;
+                    }
+                    
+                    // Center the image
+                    const x = (pdfWidth - finalWidth) / 2;
+                    const y = (pdfHeight - finalHeight) / 2;
+
+                    pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                    pdf.save('hece-ayirma-etkinligi.pdf');
+
+                    // Restore placeholders after PDF generation
+                    inputs.forEach((input, index) => {
+                        input.placeholder = originalPlaceholders[index];
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
+
