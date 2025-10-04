@@ -8,317 +8,328 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --page-bg: #fdfdf6; /* Defter kağıdı rengi */
-            --text-color: #333;
-            --line-color: #cce0ff; /* Açık mavi çizgi rengi */
-            --margin-line-color: rgba(255, 150, 150, 0.6); /* Kırmızı kenar çizgisi */
-            --accent-color: #007bff;
-            --example-color: #e91e63;
-            --ink-color: #0d47a1; /* Koyu mavi mürekkep rengi */
-        }
+    :root {
+        --page-bg: #fdfdf6;
+        --text-color: #333;
+        --line-color: #cce0ff;
+        --margin-line-color: rgba(255, 150, 150, 0.6);
+        --accent-color: #007bff;
+        --example-color: #e91e63;
+        --ink-color: #0d47a1;
+    }
 
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background-color: #e8e8e3;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-color);
-        }
+    body {
+        font-family: 'Quicksand', sans-serif;
+        background-color: #e8e8e3;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--text-color);
+    }
 
+    .worksheet-container {
+        background-color: var(--page-bg);
+        width: 100%;
+        max-width: 800px; /* Masaüstü için sınırlı genişlik */
+        padding: 20px 20px 20px 40px;
+        box-sizing: border-box;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 30px;
+    }
+
+    .worksheet-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 40px;
+        width: 2px;
+        height: 100%;
+        background-color: var(--margin-line-color);
+    }
+
+    .hole-punches {
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        padding: 20px 0;
+        box-sizing: border-box;
+    }
+
+    .hole {
+        width: 8mm;
+        height: 8mm;
+        background-color: #e8e8e3;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+        font-size: 1.3em;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    main {
+        flex-grow: 1;
+        background-image: repeating-linear-gradient(to bottom, transparent, transparent 49px, var(--line-color) 49px, var(--line-color) 50px);
+        background-position-y: 15px;
+    }
+
+    .columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px 40px;
+    }
+
+    .word-item {
+        display: flex;
+        align-items: center;
+        font-size: 1.1em;
+        min-height: 45px;
+    }
+
+    .word {
+        font-weight: 500;
+        width: 90px;
+        flex-shrink: 0;
+    }
+
+    .arrow {
+        margin: 0 10px;
+        color: var(--accent-color);
+    }
+
+    .answer-space {
+        font-family: 'Caveat', cursive;
+        font-size: 1.4em;
+        font-weight: 500;
+        color: var(--ink-color);
+        flex-grow: 1;
+        padding-left: 5px;
+        cursor: text;
+    }
+
+    .answer-space:focus {
+        outline: none;
+        background-color: rgba(0, 123, 255, 0.05);
+        border-radius: 3px;
+    }
+
+    .example-answer {
+         font-family: 'Caveat', cursive;
+         font-size: 1.4em;
+         font-weight: 500;
+         flex-grow: 1;
+         padding-left: 5px;
+         color: var(--example-color);
+    }
+
+    footer {
+        width: calc(100% - 60px);
+        position: relative;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9em;
+        font-weight: 500;
+        color: #888;
+    }
+
+    .print-button-container {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .print-button {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .print-button:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
         .worksheet-container {
-            background-color: var(--page-bg);
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm 20mm 20mm 40mm; /* Sol boşluğu artırdık */
-            box-sizing: border-box;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            padding: 15px 15px 15px 20px;
         }
 
-        /* Defterin kırmızı kenar çizgisi */
         .worksheet-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 35mm;
-            width: 2px;
-            height: 100%;
-            background-color: var(--margin-line-color);
-        }
-
-        /* Defterin delikleri */
-        .hole-punches {
-            position: absolute;
-            left: 10mm;
-            top: 0;
-            bottom: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            padding: 30mm 0;
-            box-sizing: border-box;
-        }
-
-        .hole {
-            width: 8mm;
-            height: 8mm;
-            background-color: #e8e8e3;
-            border-radius: 50%;
-            border: 1px solid #ccc;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-        }
-
-        header h1 {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 30px;
-            text-align: left;
-            padding-bottom: 10px;
-            border: none; /* Kenarlık kaldırıldı */
-        }
-
-        main {
-            flex-grow: 1;
-            /* Defterin mavi çizgileri */
-            background-image: repeating-linear-gradient(to bottom, transparent, transparent 49px, var(--line-color) 49px, var(--line-color) 50px);
-            background-position-y: 15px; /* Başlığa göre hizalama */
+            left: 20px;
         }
 
         .columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0 40px;
-        }
-
-        .word-item {
-            display: flex;
-            align-items: center;
-            font-size: 1.2em;
-            height: 50px;
-            line-height: 50px;
+            grid-template-columns: 1fr; /* Mobilde tek sütun */
+            gap: 15px 0;
         }
 
         .word {
-            font-weight: 500;
-            width: 90px;
+            width: 80px;
         }
 
-        .arrow {
-            margin: 0 10px;
-            color: var(--accent-color);
+        .answer-space, .example-answer {
+            font-size: 1.3em;
         }
+    }
 
-        .answer-space {
-            font-family: 'Caveat', cursive; /* El yazısı fontu */
-            font-size: 1.6em; /* Fontu biraz büyüttük */
-            font-weight: 500;
-            color: var(--ink-color);
-            flex-grow: 1;
-            padding-left: 5px;
-            border-bottom: none; /* Alt çizgiyi kaldırdık */
-            cursor: text;
+    @media print {
+        body {
+            background-color: #fff;
+            padding: 0;
         }
-        
-        .answer-space:focus {
-            outline: none;
-            background-color: rgba(0, 123, 255, 0.05);
-            border-radius: 3px;
+        .worksheet-container {
+            box-shadow: none;
+            margin: 0;
+            width: 100%;
+            padding: 15mm 15mm 15mm 35mm;
         }
-
-        .example-answer {
-             font-family: 'Caveat', cursive;
-             font-size: 1.6em;
-             font-weight: 500;
-             flex-grow: 1;
-             padding-left: 5px;
-             color: var(--example-color);
+        .worksheet-container::before {
+            left: 30mm;
         }
-
+        .print-button-container, .hole-punches {
+            display: none;
+        }
         footer {
-            width: calc(100% - 60mm); /* Padding'e göre ayarlandı */
-            position: absolute;
-            bottom: 15mm;
-            left: 40mm;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9em;
-            font-weight: 500;
-            color: #888;
+            width: calc(100% - 50mm);
+            left: 35mm;
+            bottom: 10mm;
         }
-
-        .print-button-container {
-            width: 210mm;
-            text-align: center;
-            margin-bottom: 20px;
-            display: none; /* Başlangıçta gizli */
-        }
-
-        .print-button {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-family: 'Quicksand', sans-serif;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .print-button:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
-
-        @media print {
-            body {
-                background-color: #fff;
-                padding: 0;
-            }
-            .worksheet-container {
-                box-shadow: none;
-                margin: 0;
-                width: 100%;
-                height: 100%;
-                padding: 15mm 15mm 15mm 35mm;
-            }
-            .worksheet-container::before {
-                left: 30mm;
-            }
-            .print-button-container, .hole-punches {
-                display: none;
-            }
-            footer {
-                 width: calc(100% - 50mm);
-                 left: 35mm;
-                 bottom: 10mm;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
 
-    <div class="print-button-container" id="printButtonContainer">
-        <button class="print-button" onclick="window.print()">🖨️ Yazdır / PDF Olarak Kaydet</button>
+<div class="print-button-container" id="printButtonContainer">
+    <button class="print-button" onclick="window.print()">🖨️ Yazdır / PDF Olarak Kaydet</button>
+</div>
+
+<div class="worksheet-container">
+    <div class="hole-punches">
+        <div class="hole"></div>
+        <div class="hole"></div>
+        <div class="hole"></div>
+        <div class="hole"></div>
     </div>
 
-    <div class="worksheet-container">
-        <div class="hole-punches">
-            <div class="hole"></div>
-            <div class="hole"></div>
-            <div class="hole"></div>
-            <div class="hole"></div>
-        </div>
+    <header>
+        <h1>1. Aşağıda verilen kelimelerin zıt anlamlarını örnekteki gibi yazalım.</h1>
+    </header>
 
-        <header>
-            <h1>1. Aşağıda verilen kelimelerin zıt anlamlarını örnekteki gibi yazalım.</h1>
-        </header>
-
-        <main>
-            <div class="columns">
-                <!-- Sol Sütun -->
-                <div class="column">
-                    <div class="word-item">
-                        <span class="word">uzak</span>
-                        <span class="arrow">→</span>
-                        <span class="example-answer">yakın</span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">taze</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">eski</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">ince</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">dar</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">büyük</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">erken</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">yüksek</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
+    <main>
+        <div class="columns">
+            <div class="column">
+                <div class="word-item">
+                    <span class="word">uzak</span>
+                    <span class="arrow">→</span>
+                    <span class="example-answer">yakın</span>
                 </div>
-
-                <!-- Sağ Sütun -->
-                <div class="column">
-                     <div class="word-item">
-                        <span class="word">aydınlık</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">gece</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">yumuşak</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">şişman</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">genç</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">kirli</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">az</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
-                    <div class="word-item">
-                        <span class="word">siyah</span>
-                        <span class="arrow">→</span>
-                        <span class="answer-space" contenteditable="true"></span>
-                    </div>
+                <div class="word-item">
+                    <span class="word">taze</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">eski</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">ince</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">dar</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">büyük</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">erken</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">yüksek</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
                 </div>
             </div>
-        </main>
+            <div class="column">
+                <div class="word-item">
+                    <span class="word">aydınlık</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">gece</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">yumuşak</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">şişman</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">genç</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">kirli</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">az</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+                <div class="word-item">
+                    <span class="word">siyah</span>
+                    <span class="arrow">→</span>
+                    <span class="answer-space" contenteditable="true"></span>
+                </div>
+            </div>
+        </div>
+    </main>
 
-        <footer>
-            <div class="footer-left">ilkokulakademi.com</div>
-            <div class="footer-right">3. Sınıf Türkçe</div>
-        </footer>
-    </div>
+    <footer>
+        <div class="footer-left">ilkokulakademi.com</div>
+        <div class="footer-right">3. Sınıf Türkçe</div>
+    </footer>
+</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
