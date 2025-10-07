@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saha Komiserleri Maç Akışı Görev Adımları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://images.pexels.com/photos/1171084/pexels-photo-1171084.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .infographic-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .infographic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .message-box {
+            background-color: #e9f5ff; /* Light blue background */
+            border-left: 4px solid #1a73e8; /* Blue accent border */
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #202124;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
+
+    <div class="container mx-auto max-w-6xl">
+        <!-- Ana Başlık -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white shadow-lg bg-black bg-opacity-40 rounded-xl py-4 px-6 inline-block">
+                🏟️ Saha Komiserleri Maç Akışı Görev Adımları
+            </h1>
+        </header>
+
+        <!-- Adımlar Grid Yapısı -->
+        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- 1. Adım: Maç Öncesi -->
+            <div class="infographic-card rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
+                    <span class="text-3xl mr-3">⚽️ 1️⃣</span> Maç Öncesi
+                </h2>
+                <div class="text-gray-700 space-y-3">
+                    <p><span class="font-semibold">Ev Sahibi:</span> Arifiye Spor</p>
+                    <p><span class="font-semibold">Deplasman:</span> Geyve Spor</p>
+                    <ul class="list-disc list-inside space-y-2 mt-2">
+                        <li>Her iki takımdan esame listelerinin net fotoğrafları alınır.</li>
+                        <li>Alınan esame listeleri resmi WhatsApp grubunda paylaşılır.</li>
+                    </ul>
+                    <div class="message-box">📸 “Arifiye Spor Esame Listesi”</div>
+                    <div class="message-box">📸 “Geyve Spor Esame Listesi”</div>
+                </div>
+            </div>
+
+            <!-- 2. Adım: Maç Başlangıcı -->
+            <div class="infographic-card rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
+                    <span class="text-3xl mr-3">🕐 2️⃣</span> Maç Başlangıcı
+                </h2>
+                <div class="text-gray-700 space-y-3">
+                    <p>Maçın başlamasıyla birlikte grup üzerinden bilgi paylaşılır:</p>
+                    <div class="message-box">🟢 “Arifiye Spor – Geyve Spor karşılaşması başlamıştır.”</div>
+                </div>
+            </div>
+
+            <!-- 3. Adım: Maç Devam Ederken -->
+            <div class="infographic-card rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
+                    <span class="text-3xl mr-3">⚽️ 3️⃣</span> Maç Devam Ederken
+                </h2>
+                <div class="text-gray-700 space-y-4">
+                    <div>
+                        <p class="font-semibold">Gol olduğunda:</p>
+                        <div class="message-box">⚽ “Gol – Arifiye Spor / Oyuncu: Mehmet Yılmaz (23.dk)”</div>
+                        <div class="message-box">⚽ “Gol – Geyve Spor / Oyuncu: Ali Kaya (41.dk)”</div>
+                    </div>
+                    <div>
+                        <p class="font-semibold">Kırmızı kart olduğunda:</p>
+                         <div class="message-box">🟥 “Kırmızı Kart – Geyve Spor / Oyuncu: Ahmet Demir (68.dk)”</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Adım: Devre Arası -->
+            <div class="infographic-card rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
+                    <span class="text-3xl mr-3">⏸️ 4️⃣</span> Devre Arası
+                </h2>
+                <div class="text-gray-700 space-y-3">
+                    <p>İlk yarı tamamlandığında paylaşım yapılır:</p>
+                    <div class="message-box">⏸️ “İlk Yarı Sonucu: Arifiye Spor 1 – 0 Geyve Spor”</div>
+                </div>
+            </div>
+            
+            <!-- 5. Adım: İkinci Yarı Başlangıcı -->
+            <div class="infographic-card rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
+                    <span class="text-3xl mr-3">▶️ 5️⃣</span> İkinci Yarı
+                </h2>
+                <div class="text-gray-700 space-y-3">
+                    <p>İkinci yarı başlarken paylaşım yapılır:</p>
+                    <div class="message-box">▶️ “İkinci yarı başladı.”</div>
+                </div>
+            </div>
+
+            <!-- 6. Adım: Maç Sonu -->
+            <div class="infographic-card rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
+                    <span class="text-3xl mr-3">🏁 6️⃣</span> Maç Sonu
+                </h2>
+                <div class="text-gray-700 space-y-3">
+                    <p>Maç tamamlandığında sonuç paylaşılır:</p>
+                    <div class="message-box">🏁 “Maç Sonucu: Arifiye Spor 2 – 1 Geyve Spor”</div>
+                </div>
+            </div>
+
+            <!-- 7. Adım: Meta Spor Süreci -->
+            <div class="infographic-card rounded-2xl shadow-lg p-6 md:col-span-2 lg:col-span-3">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
+                    <span class="text-3xl mr-3">💻 7️⃣</span> Meta Spor Bölge Sorumlusu Süreci
+                </h2>
+                <div class="text-gray-700 space-y-3">
+                   <ul class="list-disc list-inside space-y-2">
+                        <li>WhatsApp grubunda paylaşılan tüm bilgiler, Meta Spor Bölge Sorumluları tarafından düzenli olarak takip edilir.</li>
+                        <li>Bölge sorumluları, saha komiserlerinden gelen verileri bilgisayar üzerinden sisteme işler.</li>
+                        <li>Giriş yapılan bilgiler, Meta Spor iOS ve Android uygulamaları üzerinden otomatik olarak paylaşılır.</li>
+                        <li>📲 Böylece istatistikler, skorlar ve kart bilgileri anlık olarak görüntülenebilir.</li>
+                   </ul>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
